@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estoque Visual - Local</title>
+  <style>
+    :root{
+      --bg:#0f172a;--card:#020617;--border:#1e293b;--text:#e5e7eb;
+      --ok:#22c55e;--low:#eab308;--out:#ef4444;--btn:#2563eb
+    }
+    body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+    header{padding:16px;text-align:center;font-size:1.4rem;font-weight:600;background:#020617;border-bottom:1px solid var(--border)}
+    button{padding:10px 14px;border:none;border-radius:10px;background:var(--btn);color:#fff;cursor:pointer}
+    input,select{padding:10px;border-radius:10px;border:none;outline:none}
+
+    .login{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .login-box{background:var(--card);padding:30px;border-radius:18px;width:100%;max-width:340px}
+
+    .app{display:none}
+    .top-actions{display:flex;gap:10px;justify-content:center;margin:20px}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;padding:20px;max-width:1200px;margin:auto}
+    .card{background:var(--card);border-radius:18px;overflow:hidden}
+    .card img{width:100%;height:160px;object-fit:cover}
+    .card-body{padding:14px}
+    .name{font-weight:600;margin-bottom:6px}
+    .stock.ok{color:var(--ok)}.stock.low{color:var(--low)}.stock.out{color:var(--out)}
+
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
+    .modal.active{display:flex}
+    .modal-content{background:var(--card);padding:20px;border-radius:18px;width:100%;max-width:400px}
+  </style>
+</head>
+<body>
+
+<div class="login" id="login">
+  <div class="login-box">
+    <h2>🔐 Login</h2>
+    <input id="user" placeholder="Usuário" />
+    <input id="pass" type="password" placeholder="Senha" />
+    <button onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<div class="app" id="app">
+<header>📦 Estoque Visual (Local)</header>
+
+<div class="top-actions">
+  <button onclick="openModal('add')">➕ Cadastrar Item</button>
+  <button onclick="openModal('move')">🔄 Entrada / Saída</button>
+  <button onclick="logout()">🚪 Sair</button>
+</div>
+
+<div class="grid" id="catalog"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3 id="modalTitle"></h3>
+    <form id="modalForm"></form>
+  </div>
+</div>
+
+<script>
+const USER='admin', PASS='1234';
+const loginBox=document.getElementById('login');
+const app=document.getElementById('app');
+const catalog=document.getElementById('catalog');
+const modal=document.getElementById('modal');
+const modalForm=document.getElementById('modalForm');
+const modalTitle=document.getElementById('modalTitle');
+
+let items = JSON.parse(localStorage.getItem('estoque')) || [];
+
+function save(){ localStorage.setItem('estoque', JSON.stringify(items)); }
+
+function login(){
+  if(user.value===USER && pass.value===PASS){
+    localStorage.setItem('auth','ok');
+    loginBox.style.display='none'; app.style.display='block'; render();
+  } else alert('Login inválido');
+}
+function logout(){ localStorage.clear(); location.reload(); }
+if(localStorage.getItem('auth')==='ok'){ loginBox.style.display='none'; app.style.display='block'; render(); }
+
+function stockClass(q){ if(q<=0)return 'out'; if(q<=5)return 'low'; return 'ok'; }
+
+function render(){
+  catalog.innerHTML='';
+  items.forEach(i=>{
+    catalog.innerHTML+=`
+    <div class="card">
+      <img src="${i.foto}">
+      <div class="card-body">
+        <div class="name">${i.nome}</div>
+        <div class="stock ${stockClass(i.quantidade)}">Estoque: ${i.quantidade}</div>
+      </div>
+    </div>`;
+  });
+}
+
+function openModal(type){
+  modal.classList.add('active'); modalForm.innerHTML='';
+
+  if(type==='add'){
+    modalTitle.textContent='Cadastrar Item';
+    modalForm.innerHTML=`
+      <input name="nome" placeholder="Nome" required>
+      <input name="foto" placeholder="Foto URL" required>
+      <input type="number" name="quantidade" placeholder="Quantidade" required>
+      <button>Cadastrar</button>`;
+  }
+
+  if(type==='move'){
+    modalTitle.textContent='Entrada / Saída';
+    modalForm.innerHTML=`
+      <select name="nome">${items.map(i=>`<option>${i.nome}</option>`).join('')}</select>
+      <select name="tipo"><option>Entrada</option><option>Saída</option></select>
+      <input type="number" name="quantidade" placeholder="Quantidade" required>
+      <button>Registrar</button>`;
+  }
+
+  modalForm.onsubmit=e=>submitForm(e,type);
+}
+
+function submitForm(e,type){
+  e.preventDefault();
+  const d=Object.fromEntries(new FormData(e.target));
+
+  if(type==='add') items.push({nome:d.nome,foto:d.foto,quantidade:+d.quantidade});
+
+  if(type==='move'){
+    const it=items.find(i=>i.nome===d.nome);
+    if(it) it.quantidade += d.tipo==='Entrada'? +d.quantidade : -d.quantidade;
+  }
+
+  save(); render(); modal.classList.remove('active');
+}
+
+modal.onclick=e=>{ if(e.target===modal) modal.classList.remove('active'); }
+</script>
+</body>
+</html>
