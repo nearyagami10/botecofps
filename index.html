@@ -3,192 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estoque Visual - Firebase</title>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
+  <title>Login | ARC RAIDERS</title>
   <style>
-    :root{--bg:#0f172a;--card:#020617;--border:#1e293b;--text:#e5e7eb;--ok:#22c55e;--low:#eab308;--out:#ef4444;--btn:#2563eb}
-    body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
-    header{padding:16px;text-align:center;font-size:1.4rem;font-weight:600;background:#020617;border-bottom:1px solid var(--border)}
-    button{padding:10px 14px;border:none;border-radius:10px;background:var(--btn);color:#fff;cursor:pointer}
-    input,select{padding:10px;border-radius:10px;border:none;outline:none}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-    .login{min-height:100vh;display:flex;align-items:center;justify-content:center}
-    .login-box{background:var(--card);padding:30px;border-radius:18px;width:100%;max-width:340px}
+    body {
+      height: 100vh;
+      background: radial-gradient(circle at top, #1f2933, #0b0f14 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e5e7eb;
+    }
 
-    .app{display:none}
-    .top-actions{display:flex;gap:10px;justify-content:center;margin:20px}
+    .login-box {
+      width: 360px;
+      padding: 32px;
+      background: rgba(10, 15, 20, 0.85);
+      border: 1px solid #2f3b46;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+    }
 
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;padding:20px;max-width:1200px;margin:auto}
-    .card{background:var(--card);border-radius:18px;overflow:hidden}
-    .card img{width:100%;height:160px;object-fit:cover}
-    .card-body{padding:14px}
-    .name{font-weight:600;margin-bottom:6px}
-    .stock.ok{color:var(--ok)}.stock.low{color:var(--low)}.stock.out{color:var(--out)}
+    .login-box h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+      font-size: 22px;
+    }
 
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
-    .modal.active{display:flex}
-    .modal-content{background:var(--card);padding:20px;border-radius:18px;width:100%;max-width:400px}
+    .subtitle {
+      text-align: center;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 28px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      background: #0b1220;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e5e7eb;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #22d3ee, #3b82f6);
+      border: none;
+      border-radius: 8px;
+      color: #020617;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+    }
+
+    .error {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      color: #f87171;
+      display: none;
+    }
+
+    .footer {
+      margin-top: 22px;
+      text-align: center;
+      font-size: 11px;
+      color: #6b7280;
+    }
   </style>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div class="login" id="login">
   <div class="login-box">
-    <h2>🔐 Login</h2>
-    <input id="user" placeholder="Usuário" />
-    <input id="pass" type="password" placeholder="Senha" />
-    <button onclick="login()">Entrar</button>
+    <h1>ARC RAIDERS</h1>
+    <div class="subtitle">ACESSO RESTRITO</div>
+
+    <form id="loginForm">
+      <label for="user">Usuário</label>
+      <input type="text" id="user" placeholder="Digite seu usuário" required />
+
+      <label for="pass">Senha</label>
+      <input type="password" id="pass" placeholder="Digite sua senha" required />
+
+      <button type="submit">ENTRAR</button>
+    </form>
+
+    <div class="error" id="errorMsg">Usuário ou senha inválidos</div>
+
+    <div class="footer">ARC RAIDERS // LOGIN SYSTEM</div>
   </div>
-</div>
 
-<!-- APP -->
-<div class="app" id="app">
-<header>📦 Estoque Visual (Firebase)</header>
-<div class="top-actions">
-  <button onclick="openModal('add')">➕ Cadastrar</button>
-  <button onclick="openModal('move')">🔄 Entrada / Saída</button>
-  <button onclick="logout()">🚪 Sair</button>
-</div>
-<div class="grid" id="catalog"></div>
-</div>
+  <script>
+    const users = {
+      alan: "admin",
+      hugo: "admin",
+      wash: "admin"
+    };
 
-<!-- MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <h3 id="modalTitle"></h3>
-    <form id="modalForm"></form>
-  </div>
-</div>
+    const form = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
 
-<script>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-// 🔥 CONFIG FIREBASE (cole os seus dados aqui)
-const firebaseConfig = {
-  apiKey: "AIzaSyAv6DVS0efLa_Pducb0BP8o-bVY4v5Wcns",
-  authDomain: "estoque-visual-f3653.firebaseapp.com",
-  projectId: "estoque-visual-f3653",
-};
+      const username = document.getElementById("user").value.toLowerCase().trim();
+      const password = document.getElementById("pass").value.trim();
 
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-const loginBox = document.getElementById('login');
-const app = document.getElementById('app');
-const catalog = document.getElementById('catalog');
-const modal = document.getElementById('modal');
-const modalForm = document.getElementById('modalForm');
-const modalTitle = document.getElementById('modalTitle');
-
-let items = [];
-
-function stockClass(q){ if(q<=0)return 'out'; if(q<=5)return 'low'; return 'ok'; }
-
-function render(){
-  catalog.innerHTML='';
-  items.forEach(i=>{
-    catalog.innerHTML+=`
-      <div class="card">
-        <img src="${i.foto}">
-        <div class="card-body">
-          <div class="name">${i.nome}</div>
-          <div class="stock ${stockClass(i.quantidade)}">Estoque: ${i.quantidade}</div>
-        </div>
-      </div>`;
-  });
-}
-
-
-// 🔄 AUTH STATE
-auth.onAuthStateChanged(user=>{
-  if(user){
-    loginBox.style.display='none';
-    app.style.display='block';
-    loadItems();
-  } else {
-    loginBox.style.display='flex';
-    app.style.display='none';
-  }
-});
-
-// 📦 BANCO
-function loadItems(){
-  db.collection('estoque').onSnapshot(snap=>{
-    items = snap.docs.map(d=>({id:d.id,...d.data()}));
-    render();
-  });
-}
-
-function openModal(type){
-  modal.classList.add('active'); modalForm.innerHTML='';
-
-  if(type==='add'){
-    modalTitle.textContent='Cadastrar Item';
-    modalForm.innerHTML=`
-      <input name="nome" placeholder="Nome" required>
-      <input name="foto" placeholder="Foto URL" required>
-      <input type="number" name="quantidade" placeholder="Quantidade" required>
-      <button type="submit" onkeydown="handleEnter(event, 'submit')">Cadastrar</button>`;
-  }
-
-  if(type==='move'){
-    modalTitle.textContent='Entrada / Saída';
-    modalForm.innerHTML=`
-      <select name="id">${items.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}</select>
-      <select name="tipo"><option>Entrada</option><option>Saída</option></select>
-      <input type="number" name="quantidade" placeholder="Quantidade" required>
-      <button type="submit" onkeydown="handleEnter(event, 'submit')">Registrar</button>`;
-  }
-
-  modalForm.onsubmit=e=>submitForm(e,type);
-}
-
-function submitForm(e,type){
-  e.preventDefault();
-  const d = Object.fromEntries(new FormData(e.target));
-
-  if(type==='add'){
-    db.collection('estoque').add({nome:d.nome,foto:d.foto,quantidade:+d.quantidade});
-  }
-
-  if(type==='move'){
-    const it = items.find(i=>i.id===d.id);
-    if(!it) return;
-    const nova = d.tipo==='Entrada' ? it.quantidade + +d.quantidade : it.quantidade - +d.quantidade;
-    db.collection('estoque').doc(it.id).update({quantidade:nova});
-  }
-
-  modal.classList.remove('active');
-}
-
-modal.onclick=e=>{ if(e.target===modal) modal.classList.remove('active'); }
-</script>
-<script>
-  // ===== CONFIGURAÇÕES =====
-  const USER = 'admin';
-  const PASS = '1234';
-
-  
-
-  // ===== LOGIN =====
-  function login(){
-    if(user.value === USER && pass.value === PASS){
-      localStorage.setItem('auth','ok');
-      loginBox.style.display='none';
-      app.style.display='block';
-      loadItems();
-    } else alert('Usuário ou senha inválidos');
-  }
-  function logout(){ localStorage.clear(); location.reload(); }
-  if(localStorage.getItem('auth')==='ok'){ loginBox.style.display='none'; app.style.display='block'; loadItems(); }
-
-
-</script>
+      if (users[username] && users[username] === password) {
+        window.location.href = "index.html";
+      } else {
+        errorMsg.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
