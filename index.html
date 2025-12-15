@@ -1,296 +1,275 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>ARC Stock Control</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>ARC Stock Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-:root{
-  --bg:#0b0f14;
-  --panel:#121826;
-  --accent:#00ffcc;
-  --danger:#ff3b3b;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-}
-*{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
-body{
-  margin:0;
-  background:radial-gradient(circle at top,#101826,var(--bg));
-  color:var(--text);
-}
-header{
-  padding:20px;
-  border-bottom:1px solid #1f2937;
-  display:flex;
-  justify-content:space-between;
-}
-header h1{color:var(--accent);margin:0}
-main{max-width:1200px;margin:auto;padding:20px}
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #121826;
+      --accent: #00ffcc;
+      --accent2: #ff3b3b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
 
-.tabs{display:flex;gap:10px;margin-bottom:20px}
-.tabs button{
-  background:#0b1220;
-  border:1px solid #1f2937;
-  color:var(--text);
-  padding:10px 16px;
-  border-radius:8px;
-  cursor:pointer;
-}
-.tabs button.active{
-  background:linear-gradient(135deg,var(--accent),#00bfa5);
-  color:#000;
-  font-weight:bold;
-}
+    * { box-sizing: border-box; font-family: Segoe UI, Tahoma, sans-serif; }
 
-.tab{display:none}
-.tab.active{display:block}
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #101826, var(--bg));
+      color: var(--text);
+    }
 
-.form{
-  background:var(--panel);
-  padding:15px;
-  border-radius:10px;
-  display:grid;
-  grid-template-columns:1fr 120px 1fr 120px;
-  gap:10px;
-  margin-bottom:20px;
-}
+    header {
+      padding: 20px;
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-input,button{
-  background:#0b1220;
-  border:1px solid #1f2937;
-  color:var(--text);
-  padding:10px;
-  border-radius:6px;
-}
-button{
-  background:linear-gradient(135deg,var(--accent),#00bfa5);
-  color:#000;
-  font-weight:bold;
-}
+    header h1 { color: var(--accent); margin: 0; letter-spacing: 2px; }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:16px;
-}
-.card{
-  background:#121826;
-  border-radius:12px;
-  border:1px solid #1f2937;
-  overflow:hidden;
-}
-.card img{width:100%;height:160px;object-fit:cover}
-.card .content{padding:12px}
-.low{color:var(--danger);font-weight:bold}
-.actions{display:flex;gap:6px;margin-top:8px}
-.actions button{
-  flex:1;
-  background:#0b1220;
-  color:var(--text);
-}
+    main { max-width: 1200px; margin: auto; padding: 20px; }
 
-table{width:100%;border-collapse:collapse}
-th,td{padding:8px;border-bottom:1px solid #1f2937}
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tabs button {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background: linear-gradient(135deg, var(--accent), #00bfa5);
+      color: #000;
+      font-weight: bold;
+    }
 
-canvas{max-width:400px}
-.percent{
-  text-align:center;
-  margin-top:10px;
-  color:var(--muted);
-}
-</style>
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .add-form {
+      background: var(--panel);
+      padding: 16px;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: 1fr 120px 1fr 120px;
+      gap: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #1f2937;
+    }
+
+    .add-form input, .add-form button {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .add-form button {
+      background: linear-gradient(135deg, var(--accent), #00bfa5);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, #121826, #0b1220);
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card img { width: 100%; height: 160px; object-fit: cover; }
+    .card .content { padding: 12px; }
+    .card h3 { margin: 0 0 6px; color: var(--accent); }
+
+    .qty { margin-bottom: 10px; }
+    .low { color: var(--accent2); font-weight: bold; }
+
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 15px; }
+
+    .error {
+      background: #2b0f14;
+      border: 1px solid #ff3b3b;
+      color: #ffb4b4;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+    }
+  </style>
 </head>
-
 <body>
 
 <header>
   <h1>ARC STOCK CONTROL</h1>
-  <span style="color:var(--muted)">Estoque compartilhado</span>
+  <span style="color:var(--muted)">Google Sheets • Tempo real</span>
 </header>
 
 <main>
+  <div id="errorBox" class="error"></div>
 
-<div class="tabs">
-  <button class="active" onclick="openTab('estoque',this)">Estoque</button>
-  <button onclick="openTab('dashboard',this)">Dashboard</button>
-  <button onclick="openTab('relatorio',this)">Relatório</button>
-</div>
-
-<!-- ESTOQUE -->
-<section id="estoque" class="tab active">
-  <div class="form">
-    <input id="nome" placeholder="Produto">
-    <input id="qtd" type="number" placeholder="Quantidade">
-    <input id="img" placeholder="URL da imagem">
-    <button onclick="addItem()">Adicionar</button>
+  <div class="tabs">
+    <button class="active" onclick="openTab(event,'estoque')">Estoque</button>
+    <button onclick="openTab(event,'dashboard')">Dashboard</button>
   </div>
-  <div class="grid" id="grid"></div>
-</section>
 
-<!-- DASHBOARD -->
-<section id="dashboard" class="tab">
-  <h2 style="color:var(--accent)">Dashboard</h2>
-  <canvas id="chart" width="400" height="300"></canvas>
-  <div class="percent" id="percent"></div>
-</section>
+  <section id="estoque" class="tab active">
+    <div class="add-form">
+      <input id="name" placeholder="Nome do produto">
+      <input id="qty" type="number" placeholder="Qtd">
+      <input id="img" placeholder="URL da imagem">
+      <button onclick="addItem()">Adicionar</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
 
-<!-- RELATÓRIO -->
-<section id="relatorio" class="tab">
-  <h2 style="color:var(--accent)">Relatório Detalhado</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Data / Hora</th>
-        <th>Produto</th>
-        <th>Tipo</th>
-        <th>Qtd</th>
-        <th>Usuário</th>
-      </tr>
-    </thead>
-    <tbody id="report"></tbody>
-  </table>
-</section>
-
+  <section id="dashboard" class="tab">
+    <h2 style="color:var(--accent)">Dashboard</h2>
+    <canvas id="chart" width="400" height="300"></canvas>
+  </section>
 </main>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<footer>Sistema de estoque • Google Sheets</footer>
 
 <script>
-/* 🔥 CONFIG FIREBASE */
-firebase.initializeApp({
-  apiKey: "AIzaSyAv6DVS0efLa_Pducb0BP8o-bVY4v5Wcns",
-  authDomain: "estoque-visual-f3653.firebaseapp.com",
-  projectId: "estoque-visual-f3653"
-});
-const db = firebase.firestore();
+// 🔗 URL DO APPS SCRIPT (Web App publicado como "Qualquer pessoa")
+const API_URL = 'https://script.google.com/macros/s/AKfycbws47KiVoW0remngppcIKMuSZwf4PB41g0SwBHgL_oAwFiEA6ln-KAXIGnukimX_Nuz/exec';
 
-let entradas = 0;
-let saidas = 0;
+let items = [];
 
-/* ===== ABAS ===== */
-function openTab(id,btn){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.style.display = 'block';
+  box.textContent = msg;
+}
+
+function hideError() {
+  const box = document.getElementById('errorBox');
+  box.style.display = 'none';
+}
+
+function openTab(e, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-  if(id==="dashboard") drawChart();
+  e.target.classList.add('active');
+  if (id === 'dashboard') renderChart();
 }
 
-/* ===== ESTOQUE ===== */
-function addItem(){
-  if(!nome.value || !qtd.value) return alert("Preencha tudo");
-  db.collection("estoque").add({
-    nome:nome.value,
-    qtd:parseInt(qtd.value),
-    img:img.value || "https://via.placeholder.com/400x300"
-  });
-  log(nome.value,"entrada",parseInt(qtd.value));
-  nome.value=""; qtd.value=""; img.value="";
-}
+async function carregarEstoque() {
+  try {
+    hideError();
+    const res = await fetch(API_URL, { method: 'GET', mode: 'cors' });
+    if (!res.ok) throw new Error('Resposta inválida da API');
 
-function alterar(id,nomeProd,qtdAtual,val){
-  const nova=qtdAtual+val;
-  if(nova<0) return;
-  db.collection("estoque").doc(id).update({qtd:nova});
-  log(nomeProd,val>0?"entrada":"saida",Math.abs(val));
-}
+    const data = await res.json();
 
-function deletar(id,nomeProd){
-  if(confirm("Deletar item?")){
-    db.collection("estoque").doc(id).delete();
-    log(nomeProd,"deletado",0);
+    items = data.map(r => ({
+      id: r[0],
+      name: r[1],
+      qty: Number(r[2]),
+      img: r[3]
+    }));
+
+    render();
+  } catch (err) {
+    showError('Erro ao conectar com o Google Sheets. Verifique se o Apps Script está publicado como Web App e acessível ao público.');
+    console.error(err);
   }
 }
 
-/* ===== HISTÓRICO ===== */
-function log(prod,tipo,qtd){
-  db.collection("historico").add({
-    produto:prod,
-    tipo:tipo,
-    quantidade:qtd,
-    usuario:"Admin",
-    criadoEm:firebase.firestore.FieldValue.serverTimestamp()
+async function addItem() {
+  const name = document.getElementById('name').value.trim();
+  const qty = parseInt(document.getElementById('qty').value);
+  const img = document.getElementById('img').value || 'https://via.placeholder.com/400x300';
+
+  if (!name || isNaN(qty)) return;
+
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add',
+        nome: name,
+        quantidade: qty,
+        imagem: img
+      })
+    });
+
+    document.getElementById('name').value = '';
+    document.getElementById('qty').value = '';
+    document.getElementById('img').value = '';
+
+    carregarEstoque();
+  } catch (err) {
+    showError('Falha ao salvar no Google Sheets.');
+    console.error(err);
+  }
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  if (items.length === 0) {
+    grid.innerHTML = '<p style="color:#9ca3af">Nenhum item cadastrado.</p>';
+    return;
+  }
+
+  items.forEach(it => {
+    const low = it.qty <= 3 ? 'low' : '';
+    grid.innerHTML += `
+      <div class="card">
+        <img src="${it.img}">
+        <div class="content">
+          <h3>${it.name}</h3>
+          <div class="qty ${low}">Quantidade: ${it.qty}</div>
+        </div>
+      </div>`;
   });
 }
 
-/* ===== RENDER ESTOQUE ===== */
-db.collection("estoque").onSnapshot(snap=>{
-  grid.innerHTML="";
-  snap.forEach(doc=>{
-    const d=doc.data();
-    grid.innerHTML+=`
-    <div class="card">
-      <img src="${d.img}">
-      <div class="content">
-        <h3>${d.nome}</h3>
-        <div class="${d.qtd<=3?'low':''}">Qtd: ${d.qtd}</div>
-        <div class="actions">
-          <button onclick="alterar('${doc.id}','${d.nome}',${d.qtd},1)">+</button>
-          <button onclick="alterar('${doc.id}','${d.nome}',${d.qtd},-1)">-</button>
-          <button onclick="deletar('${doc.id}','${d.nome}')">Del</button>
-        </div>
-      </div>
-    </div>`;
-  });
-});
-
-/* ===== RELATÓRIO ===== */
-db.collection("historico").orderBy("criadoEm","desc").onSnapshot(snap=>{
-  report.innerHTML="";
-  entradas=0; saidas=0;
-
-  snap.forEach(doc=>{
-    const h=doc.data();
-    if(h.tipo==="entrada") entradas+=h.quantidade;
-    if(h.tipo==="saida") saidas+=h.quantidade;
-
-    const d=h.criadoEm?.toDate();
-    const data=d?d.toLocaleString("pt-BR"):"";
-
-    report.innerHTML+=`
-    <tr>
-      <td>${data}</td>
-      <td>${h.produto}</td>
-      <td>${h.tipo.toUpperCase()}</td>
-      <td>${h.quantidade}</td>
-      <td>${h.usuario}</td>
-    </tr>`;
-  });
-  drawChart();
-});
-
-/* ===== DASHBOARD COM % ===== */
-function drawChart(){
-  const c=document.getElementById("chart");
-  const ctx=c.getContext("2d");
+function renderChart() {
+  const c = document.getElementById('chart');
+  const ctx = c.getContext('2d');
   ctx.clearRect(0,0,c.width,c.height);
 
-  const total=entradas+saidas||1;
-  let start=0;
+  const total = items.reduce((a,b)=>a+b.qty,0) || 1;
+  let start = 0;
 
-  const dados=[
-    {v:entradas,color:"#00ffcc",label:"Entradas"},
-    {v:saidas,color:"#ff3b3b",label:"Saídas"}
-  ];
-
-  dados.forEach(d=>{
-    const ang=(d.v/total)*Math.PI*2;
+  items.forEach(it => {
+    const angle = (it.qty / total) * Math.PI * 2;
     ctx.beginPath();
     ctx.moveTo(200,150);
-    ctx.arc(200,150,100,start,start+ang);
-    ctx.fillStyle=d.color;
+    ctx.arc(200,150,100,start,start+angle);
+    ctx.closePath();
+    ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
     ctx.fill();
-    start+=ang;
+    start += angle;
   });
-
-  document.getElementById("percent").innerHTML=
-    `Entradas: ${(entradas/total*100).toFixed(1)}% | Saídas: ${(saidas/total*100).toFixed(1)}%`;
 }
-</script>
 
+// testes básicos
+console.assert(typeof fetch === 'function', 'Fetch API não disponível');
+
+setInterval(carregarEstoque, 5000);
+carregarEstoque();
+</script>
 </body>
 </html>
