@@ -41,8 +41,8 @@
 <div class="login" id="login">
   <div class="login-box">
     <h2>🔐 Login</h2>
-    <input id="email" placeholder="Email" onkeydown="handleEnter(event, 'login')" />
-    <input id="password" type="password" placeholder="Senha" onkeydown="handleEnter(event, 'login')" />
+    <input id="user" placeholder="Usuário" />
+    <input id="pass" type="password" placeholder="Senha" />
     <button onclick="login()">Entrar</button>
   </div>
 </div>
@@ -112,12 +112,6 @@ function render(){
   });
 }
 
-// 🔐 LOGIN
-function login(){
-  auth.signInWithEmailAndPassword(email.value, password.value)
-    .catch(e=>alert(e.message));
-}
-function logout(){ auth.signOut(); }
 
 // 🔄 AUTH STATE
 auth.onAuthStateChanged(user=>{
@@ -182,6 +176,27 @@ function submitForm(e,type){
 }
 
 modal.onclick=e=>{ if(e.target===modal) modal.classList.remove('active'); }
+</script>
+<script>
+  // ===== CONFIGURAÇÕES =====
+  const USER = 'admin';
+  const PASS = '1234';
+
+  
+
+  // ===== LOGIN =====
+  function login(){
+    if(user.value === USER && pass.value === PASS){
+      localStorage.setItem('auth','ok');
+      loginBox.style.display='none';
+      app.style.display='block';
+      loadItems();
+    } else alert('Usuário ou senha inválidos');
+  }
+  function logout(){ localStorage.clear(); location.reload(); }
+  if(localStorage.getItem('auth')==='ok'){ loginBox.style.display='none'; app.style.display='block'; loadItems(); }
+
+
 </script>
 </body>
 </html>
