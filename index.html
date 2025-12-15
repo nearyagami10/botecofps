@@ -1,149 +1,295 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login | ARC RAIDERS</title>
+  <meta charset="UTF-8">
+  <title>ARC Stock Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+    :root {
+      --bg: #0b0f14;
+      --panel: #121826;
+      --accent: #00ffcc;
+      --accent2: #ff3b3b;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
     }
+
+    * { box-sizing: border-box; font-family: Segoe UI, Tahoma, sans-serif; }
 
     body {
-      height: 100vh;
-      background: radial-gradient(circle at top, #1f2933, #0b0f14 60%);
+      margin: 0;
+      background: radial-gradient(circle at top, #101826, var(--bg));
+      color: var(--text);
+    }
+
+    header {
+      padding: 20px;
+      border-bottom: 1px solid #1f2937;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      color: #e5e7eb;
     }
 
-    .login-box {
-      width: 360px;
-      padding: 32px;
-      background: rgba(10, 15, 20, 0.85);
-      border: 1px solid #2f3b46;
-      border-radius: 12px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(6px);
-    }
+    header h1 { color: var(--accent); margin: 0; letter-spacing: 2px; }
 
-    .login-box h1 {
-      text-align: center;
-      margin-bottom: 8px;
-      letter-spacing: 2px;
-      font-size: 22px;
-    }
+    main { max-width: 1200px; margin: auto; padding: 20px; }
 
-    .subtitle {
-      text-align: center;
-      font-size: 12px;
-      color: #9ca3af;
-      margin-bottom: 28px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      color: #cbd5e1;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 18px;
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+    .tabs button {
       background: #0b1220;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: #e5e7eb;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #22d3ee, #3b82f6);
-      border: none;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 10px 16px;
       border-radius: 8px;
-      color: #020617;
+      cursor: pointer;
+    }
+    .tabs button.active {
+      background: linear-gradient(135deg, var(--accent), #00bfa5);
+      color: #000;
+      font-weight: bold;
+    }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    .add-form {
+      background: var(--panel);
+      padding: 16px;
+      border-radius: 10px;
+      display: grid;
+      grid-template-columns: 1fr 120px 1fr 120px;
+      gap: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #1f2937;
+    }
+
+    .add-form input, .add-form button {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .add-form button {
+      background: linear-gradient(135deg, var(--accent), #00bfa5);
+      color: #000;
       font-weight: bold;
       cursor: pointer;
-      letter-spacing: 1px;
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
-    button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
     }
 
-    .error {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 13px;
-      color: #f87171;
-      display: none;
+    .card {
+      background: linear-gradient(180deg, #121826, #0b1220);
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
     }
 
-    .footer {
-      margin-top: 22px;
-      text-align: center;
-      font-size: 11px;
-      color: #6b7280;
+    .card img { width: 100%; height: 160px; object-fit: cover; }
+    .card .content { padding: 12px; }
+    .card h3 { margin: 0 0 6px; color: var(--accent); }
+
+    .qty { margin-bottom: 10px; }
+    .low { color: var(--accent2); font-weight: bold; }
+
+    .actions { display: flex; gap: 6px; }
+    .actions button {
+      flex: 1;
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      color: var(--text);
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
     }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; border-bottom: 1px solid #1f2937; text-align: left; }
+
+    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 15px; }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>ARC RAIDERS</h1>
-    <div class="subtitle">ACESSO RESTRITO</div>
 
-    <form id="loginForm">
-      <label for="user">Usuário</label>
-      <input type="text" id="user" placeholder="Digite seu usuário" required />
+<header>
+  <h1>ARC STOCK CONTROL</h1>
+  <span style="color:var(--muted)">Modo empresa pequena</span>
+</header>
 
-      <label for="pass">Senha</label>
-      <input type="password" id="pass" placeholder="Digite sua senha" required />
-
-      <button type="submit">ENTRAR</button>
-    </form>
-
-    <div class="error" id="errorMsg">Usuário ou senha inválidos</div>
-
-    <div class="footer">ARC RAIDERS // LOGIN SYSTEM</div>
+<main>
+  <div class="tabs">
+    <button class="active" onclick="openTab(event,'estoque')">Estoque</button>
+    <button onclick="openTab(event,'dashboard')">Dashboard</button>
+    <button onclick="openTab(event,'relatorio')">Relatório</button>
   </div>
 
-  <script>
-    const users = {
-      alan: "admin",
-      hugo: "admin",
-      wash: "admin"
-    };
+  <section id="estoque" class="tab active">
+    <div class="add-form">
+      <input id="name" placeholder="Nome do produto">
+      <input id="qty" type="number" placeholder="Qtd">
+      <input id="img" placeholder="URL da imagem">
+      <button onclick="addItem()">Adicionar</button>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
 
-    const form = document.getElementById("loginForm");
-    const errorMsg = document.getElementById("errorMsg");
+  <section id="dashboard" class="tab">
+    <h2 style="color:var(--accent)">Dashboard</h2>
+    <canvas id="chart" width="400" height="300"></canvas>
+  </section>
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+  <section id="relatorio" class="tab">
+    <h2 style="color:var(--accent)">Relatório Detalhado</h2>
+    <table id="reportTable"></table>
+  </section>
+</main>
 
-      const username = document.getElementById("user").value.toLowerCase().trim();
-      const password = document.getElementById("pass").value.trim();
+<footer>Sistema de estoque • Estilo ARC Raiders</footer>
 
-      if (users[username] && users[username] === password) {
-        window.location.href = "index.html";
-      } else {
-        errorMsg.style.display = "block";
-      }
-    });
-  </script>
+<script>
+let items = JSON.parse(localStorage.getItem('estoque_arc')) || [];
+let history = JSON.parse(localStorage.getItem('estoque_hist')) || [];
+
+function openTab(e, id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  e.target.classList.add('active');
+  if (id === 'dashboard') renderChart();
+}
+
+function save() {
+  localStorage.setItem('estoque_arc', JSON.stringify(items));
+  localStorage.setItem('estoque_hist', JSON.stringify(history));
+  render();
+  renderReport();
+  renderChart();
+}
+
+function addItem() {
+  const nameEl = document.getElementById('name');
+  const qtyEl = document.getElementById('qty');
+  const imgEl = document.getElementById('img');
+
+  const name = nameEl.value;
+  const qty = parseInt(qtyEl.value);
+  const img = imgEl.value || 'https://via.placeholder.com/400x300?text=ITEM';
+
+  if (!name || isNaN(qty)) return;
+
+  items.push({ name, qty, img });
+  history.push({ time: new Date().toLocaleString(), name, type: 'entrada', qty, user: 'Admin' });
+
+  nameEl.value = '';
+  qtyEl.value = '';
+  imgEl.value = '';
+
+  save();
+}
+
+function changeQty(i, delta) {
+  items[i].qty += delta;
+  if (items[i].qty < 0) items[i].qty = 0;
+
+  history.push({
+    time: new Date().toLocaleString(),
+    name: items[i].name,
+    type: delta > 0 ? 'entrada' : 'saida',
+    qty: Math.abs(delta),
+    user: 'Admin'
+  });
+
+  save();
+}
+
+function editItem(i) {
+  const n = prompt('Editar nome:', items[i].name);
+  const q = prompt('Editar quantidade:', items[i].qty);
+  const img = prompt('Editar URL da imagem:', items[i].img);
+
+  if (n !== null) items[i].name = n;
+  if (!isNaN(parseInt(q))) items[i].qty = parseInt(q);
+  if (img !== null) items[i].img = img;
+
+  save();
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+
+  items.forEach((it, i) => {
+    const low = it.qty <= 3 ? 'low' : '';
+    grid.innerHTML += `
+      <div class="card">
+        <img src="${it.img}">
+        <div class="content">
+          <h3>${it.name}</h3>
+          <div class="qty ${low}">Quantidade: ${it.qty}</div>
+          <div class="actions">
+            <button onclick="changeQty(${i},1)">Entrada</button>
+            <button onclick="changeQty(${i},-1)">Saída</button>
+            <button onclick="editItem(${i})">Editar</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+function renderReport() {
+  const table = document.getElementById('reportTable');
+  table.innerHTML = `
+    <tr>
+      <th>Hora</th>
+      <th>Produto</th>
+      <th>Tipo</th>
+      <th>Quantidade</th>
+      <th>Usuário</th>
+    </tr>`;
+
+  history.slice().reverse().forEach(h => {
+    table.innerHTML += `
+      <tr>
+        <td>${h.time}</td>
+        <td>${h.name}</td>
+        <td style="color:${h.type === 'entrada' ? '#00ffcc' : '#ff3b3b'}">${h.type}</td>
+        <td>${h.qty}</td>
+        <td>${h.user}</td>
+      </tr>`;
+  });
+}
+
+function renderChart() {
+  const c = document.getElementById('chart');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+
+  const entradas = history.filter(h => h.type === 'entrada').reduce((a,b)=>a+b.qty,0);
+  const saidas = history.filter(h => h.type === 'saida').reduce((a,b)=>a+b.qty,0);
+  const total = entradas + saidas || 1;
+
+  let start = 0;
+  [{v:entradas,color:'#00ffcc'},{v:saidas,color:'#ff3b3b'}].forEach(d => {
+    const angle = (d.v / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(200,150);
+    ctx.arc(200,150,100,start,start+angle);
+    ctx.closePath();
+    ctx.fillStyle = d.color;
+    ctx.fill();
+    start += angle;
+  });
+}
+
+render();
+renderReport();
+</script>
 </body>
 </html>
