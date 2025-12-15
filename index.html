@@ -1,295 +1,296 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>ARC Stock Control</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>ARC Stock Control</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    :root {
-      --bg: #0b0f14;
-      --panel: #121826;
-      --accent: #00ffcc;
-      --accent2: #ff3b3b;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-    }
+<style>
+:root{
+  --bg:#0b0f14;
+  --panel:#121826;
+  --accent:#00ffcc;
+  --danger:#ff3b3b;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+}
+*{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#101826,var(--bg));
+  color:var(--text);
+}
+header{
+  padding:20px;
+  border-bottom:1px solid #1f2937;
+  display:flex;
+  justify-content:space-between;
+}
+header h1{color:var(--accent);margin:0}
+main{max-width:1200px;margin:auto;padding:20px}
 
-    * { box-sizing: border-box; font-family: Segoe UI, Tahoma, sans-serif; }
+.tabs{display:flex;gap:10px;margin-bottom:20px}
+.tabs button{
+  background:#0b1220;
+  border:1px solid #1f2937;
+  color:var(--text);
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+}
+.tabs button.active{
+  background:linear-gradient(135deg,var(--accent),#00bfa5);
+  color:#000;
+  font-weight:bold;
+}
 
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #101826, var(--bg));
-      color: var(--text);
-    }
+.tab{display:none}
+.tab.active{display:block}
 
-    header {
-      padding: 20px;
-      border-bottom: 1px solid #1f2937;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.form{
+  background:var(--panel);
+  padding:15px;
+  border-radius:10px;
+  display:grid;
+  grid-template-columns:1fr 120px 1fr 120px;
+  gap:10px;
+  margin-bottom:20px;
+}
 
-    header h1 { color: var(--accent); margin: 0; letter-spacing: 2px; }
+input,button{
+  background:#0b1220;
+  border:1px solid #1f2937;
+  color:var(--text);
+  padding:10px;
+  border-radius:6px;
+}
+button{
+  background:linear-gradient(135deg,var(--accent),#00bfa5);
+  color:#000;
+  font-weight:bold;
+}
 
-    main { max-width: 1200px; margin: auto; padding: 20px; }
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:16px;
+}
+.card{
+  background:#121826;
+  border-radius:12px;
+  border:1px solid #1f2937;
+  overflow:hidden;
+}
+.card img{width:100%;height:160px;object-fit:cover}
+.card .content{padding:12px}
+.low{color:var(--danger);font-weight:bold}
+.actions{display:flex;gap:6px;margin-top:8px}
+.actions button{
+  flex:1;
+  background:#0b1220;
+  color:var(--text);
+}
 
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-    .tabs button {
-      background: #0b1220;
-      border: 1px solid #1f2937;
-      color: var(--text);
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .tabs button.active {
-      background: linear-gradient(135deg, var(--accent), #00bfa5);
-      color: #000;
-      font-weight: bold;
-    }
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #1f2937}
 
-    .tab { display: none; }
-    .tab.active { display: block; }
-
-    .add-form {
-      background: var(--panel);
-      padding: 16px;
-      border-radius: 10px;
-      display: grid;
-      grid-template-columns: 1fr 120px 1fr 120px;
-      gap: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #1f2937;
-    }
-
-    .add-form input, .add-form button {
-      background: #0b1220;
-      border: 1px solid #1f2937;
-      color: var(--text);
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .add-form button {
-      background: linear-gradient(135deg, var(--accent), #00bfa5);
-      color: #000;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
-    }
-
-    .card {
-      background: linear-gradient(180deg, #121826, #0b1220);
-      border: 1px solid #1f2937;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .card img { width: 100%; height: 160px; object-fit: cover; }
-    .card .content { padding: 12px; }
-    .card h3 { margin: 0 0 6px; color: var(--accent); }
-
-    .qty { margin-bottom: 10px; }
-    .low { color: var(--accent2); font-weight: bold; }
-
-    .actions { display: flex; gap: 6px; }
-    .actions button {
-      flex: 1;
-      background: #0b1220;
-      border: 1px solid #1f2937;
-      color: var(--text);
-      padding: 6px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 8px; border-bottom: 1px solid #1f2937; text-align: left; }
-
-    footer { text-align: center; color: var(--muted); font-size: 12px; padding: 15px; }
-  </style>
+canvas{max-width:400px}
+.percent{
+  text-align:center;
+  margin-top:10px;
+  color:var(--muted);
+}
+</style>
 </head>
+
 <body>
 
 <header>
   <h1>ARC STOCK CONTROL</h1>
-  <span style="color:var(--muted)">Modo empresa pequena</span>
+  <span style="color:var(--muted)">Estoque compartilhado</span>
 </header>
 
 <main>
-  <div class="tabs">
-    <button class="active" onclick="openTab(event,'estoque')">Estoque</button>
-    <button onclick="openTab(event,'dashboard')">Dashboard</button>
-    <button onclick="openTab(event,'relatorio')">Relatório</button>
+
+<div class="tabs">
+  <button class="active" onclick="openTab('estoque',this)">Estoque</button>
+  <button onclick="openTab('dashboard',this)">Dashboard</button>
+  <button onclick="openTab('relatorio',this)">Relatório</button>
+</div>
+
+<!-- ESTOQUE -->
+<section id="estoque" class="tab active">
+  <div class="form">
+    <input id="nome" placeholder="Produto">
+    <input id="qtd" type="number" placeholder="Quantidade">
+    <input id="img" placeholder="URL da imagem">
+    <button onclick="addItem()">Adicionar</button>
   </div>
+  <div class="grid" id="grid"></div>
+</section>
 
-  <section id="estoque" class="tab active">
-    <div class="add-form">
-      <input id="name" placeholder="Nome do produto">
-      <input id="qty" type="number" placeholder="Qtd">
-      <input id="img" placeholder="URL da imagem">
-      <button onclick="addItem()">Adicionar</button>
-    </div>
-    <div class="grid" id="grid"></div>
-  </section>
+<!-- DASHBOARD -->
+<section id="dashboard" class="tab">
+  <h2 style="color:var(--accent)">Dashboard</h2>
+  <canvas id="chart" width="400" height="300"></canvas>
+  <div class="percent" id="percent"></div>
+</section>
 
-  <section id="dashboard" class="tab">
-    <h2 style="color:var(--accent)">Dashboard</h2>
-    <canvas id="chart" width="400" height="300"></canvas>
-  </section>
+<!-- RELATÓRIO -->
+<section id="relatorio" class="tab">
+  <h2 style="color:var(--accent)">Relatório Detalhado</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data / Hora</th>
+        <th>Produto</th>
+        <th>Tipo</th>
+        <th>Qtd</th>
+        <th>Usuário</th>
+      </tr>
+    </thead>
+    <tbody id="report"></tbody>
+  </table>
+</section>
 
-  <section id="relatorio" class="tab">
-    <h2 style="color:var(--accent)">Relatório Detalhado</h2>
-    <table id="reportTable"></table>
-  </section>
 </main>
 
-<footer>Sistema de estoque • Estilo ARC Raiders</footer>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 <script>
-let items = JSON.parse(localStorage.getItem('estoque_arc')) || [];
-let history = JSON.parse(localStorage.getItem('estoque_hist')) || [];
+/* 🔥 CONFIG FIREBASE */
+firebase.initializeApp({
+  apiKey: "AIzaSyAv6DVS0efLa_Pducb0BP8o-bVY4v5Wcns",
+  authDomain: "estoque-visual-f3653.firebaseapp.com",
+  projectId: "estoque-visual-f3653"
+});
+const db = firebase.firestore();
 
-function openTab(e, id) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+let entradas = 0;
+let saidas = 0;
+
+/* ===== ABAS ===== */
+function openTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  e.target.classList.add('active');
-  if (id === 'dashboard') renderChart();
+  btn.classList.add('active');
+  if(id==="dashboard") drawChart();
 }
 
-function save() {
-  localStorage.setItem('estoque_arc', JSON.stringify(items));
-  localStorage.setItem('estoque_hist', JSON.stringify(history));
-  render();
-  renderReport();
-  renderChart();
-}
-
-function addItem() {
-  const nameEl = document.getElementById('name');
-  const qtyEl = document.getElementById('qty');
-  const imgEl = document.getElementById('img');
-
-  const name = nameEl.value;
-  const qty = parseInt(qtyEl.value);
-  const img = imgEl.value || 'https://via.placeholder.com/400x300?text=ITEM';
-
-  if (!name || isNaN(qty)) return;
-
-  items.push({ name, qty, img });
-  history.push({ time: new Date().toLocaleString(), name, type: 'entrada', qty, user: 'Admin' });
-
-  nameEl.value = '';
-  qtyEl.value = '';
-  imgEl.value = '';
-
-  save();
-}
-
-function changeQty(i, delta) {
-  items[i].qty += delta;
-  if (items[i].qty < 0) items[i].qty = 0;
-
-  history.push({
-    time: new Date().toLocaleString(),
-    name: items[i].name,
-    type: delta > 0 ? 'entrada' : 'saida',
-    qty: Math.abs(delta),
-    user: 'Admin'
+/* ===== ESTOQUE ===== */
+function addItem(){
+  if(!nome.value || !qtd.value) return alert("Preencha tudo");
+  db.collection("estoque").add({
+    nome:nome.value,
+    qtd:parseInt(qtd.value),
+    img:img.value || "https://via.placeholder.com/400x300"
   });
-
-  save();
+  log(nome.value,"entrada",parseInt(qtd.value));
+  nome.value=""; qtd.value=""; img.value="";
 }
 
-function editItem(i) {
-  const n = prompt('Editar nome:', items[i].name);
-  const q = prompt('Editar quantidade:', items[i].qty);
-  const img = prompt('Editar URL da imagem:', items[i].img);
-
-  if (n !== null) items[i].name = n;
-  if (!isNaN(parseInt(q))) items[i].qty = parseInt(q);
-  if (img !== null) items[i].img = img;
-
-  save();
+function alterar(id,nomeProd,qtdAtual,val){
+  const nova=qtdAtual+val;
+  if(nova<0) return;
+  db.collection("estoque").doc(id).update({qtd:nova});
+  log(nomeProd,val>0?"entrada":"saida",Math.abs(val));
 }
 
-function render() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
+function deletar(id,nomeProd){
+  if(confirm("Deletar item?")){
+    db.collection("estoque").doc(id).delete();
+    log(nomeProd,"deletado",0);
+  }
+}
 
-  items.forEach((it, i) => {
-    const low = it.qty <= 3 ? 'low' : '';
-    grid.innerHTML += `
-      <div class="card">
-        <img src="${it.img}">
-        <div class="content">
-          <h3>${it.name}</h3>
-          <div class="qty ${low}">Quantidade: ${it.qty}</div>
-          <div class="actions">
-            <button onclick="changeQty(${i},1)">Entrada</button>
-            <button onclick="changeQty(${i},-1)">Saída</button>
-            <button onclick="editItem(${i})">Editar</button>
-          </div>
+/* ===== HISTÓRICO ===== */
+function log(prod,tipo,qtd){
+  db.collection("historico").add({
+    produto:prod,
+    tipo:tipo,
+    quantidade:qtd,
+    usuario:"Admin",
+    criadoEm:firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+/* ===== RENDER ESTOQUE ===== */
+db.collection("estoque").onSnapshot(snap=>{
+  grid.innerHTML="";
+  snap.forEach(doc=>{
+    const d=doc.data();
+    grid.innerHTML+=`
+    <div class="card">
+      <img src="${d.img}">
+      <div class="content">
+        <h3>${d.nome}</h3>
+        <div class="${d.qtd<=3?'low':''}">Qtd: ${d.qtd}</div>
+        <div class="actions">
+          <button onclick="alterar('${doc.id}','${d.nome}',${d.qtd},1)">+</button>
+          <button onclick="alterar('${doc.id}','${d.nome}',${d.qtd},-1)">-</button>
+          <button onclick="deletar('${doc.id}','${d.nome}')">Del</button>
         </div>
-      </div>`;
+      </div>
+    </div>`;
   });
-}
+});
 
-function renderReport() {
-  const table = document.getElementById('reportTable');
-  table.innerHTML = `
+/* ===== RELATÓRIO ===== */
+db.collection("historico").orderBy("criadoEm","desc").onSnapshot(snap=>{
+  report.innerHTML="";
+  entradas=0; saidas=0;
+
+  snap.forEach(doc=>{
+    const h=doc.data();
+    if(h.tipo==="entrada") entradas+=h.quantidade;
+    if(h.tipo==="saida") saidas+=h.quantidade;
+
+    const d=h.criadoEm?.toDate();
+    const data=d?d.toLocaleString("pt-BR"):"";
+
+    report.innerHTML+=`
     <tr>
-      <th>Hora</th>
-      <th>Produto</th>
-      <th>Tipo</th>
-      <th>Quantidade</th>
-      <th>Usuário</th>
+      <td>${data}</td>
+      <td>${h.produto}</td>
+      <td>${h.tipo.toUpperCase()}</td>
+      <td>${h.quantidade}</td>
+      <td>${h.usuario}</td>
     </tr>`;
-
-  history.slice().reverse().forEach(h => {
-    table.innerHTML += `
-      <tr>
-        <td>${h.time}</td>
-        <td>${h.name}</td>
-        <td style="color:${h.type === 'entrada' ? '#00ffcc' : '#ff3b3b'}">${h.type}</td>
-        <td>${h.qty}</td>
-        <td>${h.user}</td>
-      </tr>`;
   });
-}
+  drawChart();
+});
 
-function renderChart() {
-  const c = document.getElementById('chart');
-  const ctx = c.getContext('2d');
+/* ===== DASHBOARD COM % ===== */
+function drawChart(){
+  const c=document.getElementById("chart");
+  const ctx=c.getContext("2d");
   ctx.clearRect(0,0,c.width,c.height);
 
-  const entradas = history.filter(h => h.type === 'entrada').reduce((a,b)=>a+b.qty,0);
-  const saidas = history.filter(h => h.type === 'saida').reduce((a,b)=>a+b.qty,0);
-  const total = entradas + saidas || 1;
+  const total=entradas+saidas||1;
+  let start=0;
 
-  let start = 0;
-  [{v:entradas,color:'#00ffcc'},{v:saidas,color:'#ff3b3b'}].forEach(d => {
-    const angle = (d.v / total) * Math.PI * 2;
+  const dados=[
+    {v:entradas,color:"#00ffcc",label:"Entradas"},
+    {v:saidas,color:"#ff3b3b",label:"Saídas"}
+  ];
+
+  dados.forEach(d=>{
+    const ang=(d.v/total)*Math.PI*2;
     ctx.beginPath();
     ctx.moveTo(200,150);
-    ctx.arc(200,150,100,start,start+angle);
-    ctx.closePath();
-    ctx.fillStyle = d.color;
+    ctx.arc(200,150,100,start,start+ang);
+    ctx.fillStyle=d.color;
     ctx.fill();
-    start += angle;
+    start+=ang;
   });
-}
 
-render();
-renderReport();
+  document.getElementById("percent").innerHTML=
+    `Entradas: ${(entradas/total*100).toFixed(1)}% | Saídas: ${(saidas/total*100).toFixed(1)}%`;
+}
 </script>
+
 </body>
 </html>
