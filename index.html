@@ -3,12 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estoque Visual - Local</title>
+  <title>Estoque Visual - Firebase</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <style>
-    :root{
-      --bg:#0f172a;--card:#020617;--border:#1e293b;--text:#e5e7eb;
-      --ok:#22c55e;--low:#eab308;--out:#ef4444;--btn:#2563eb
-    }
+    :root{--bg:#0f172a;--card:#020617;--border:#1e293b;--text:#e5e7eb;--ok:#22c55e;--low:#eab308;--out:#ef4444;--btn:#2563eb}
     body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
     header{padding:16px;text-align:center;font-size:1.4rem;font-weight:600;background:#020617;border-bottom:1px solid var(--border)}
     button{padding:10px 14px;border:none;border-radius:10px;background:var(--btn);color:#fff;cursor:pointer}
@@ -34,27 +37,28 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="login" id="login">
   <div class="login-box">
     <h2>🔐 Login</h2>
-    <input id="user" placeholder="Usuário" />
-    <input id="pass" type="password" placeholder="Senha" />
+    <input id="email" placeholder="Email" onkeydown="handleEnter(event, 'login')" />
+    <input id="password" type="password" placeholder="Senha" onkeydown="handleEnter(event, 'login')" />
     <button onclick="login()">Entrar</button>
   </div>
 </div>
 
+<!-- APP -->
 <div class="app" id="app">
-<header>📦 Estoque Visual (Local)</header>
-
+<header>📦 Estoque Visual (Firebase)</header>
 <div class="top-actions">
-  <button onclick="openModal('add')">➕ Cadastrar Item</button>
+  <button onclick="openModal('add')">➕ Cadastrar</button>
   <button onclick="openModal('move')">🔄 Entrada / Saída</button>
   <button onclick="logout()">🚪 Sair</button>
 </div>
-
 <div class="grid" id="catalog"></div>
 </div>
 
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content">
     <h3 id="modalTitle"></h3>
@@ -63,26 +67,34 @@
 </div>
 
 <script>
-const USER='admin', PASS='1234';
-const loginBox=document.getElementById('login');
-const app=document.getElementById('app');
-const catalog=document.getElementById('catalog');
-const modal=document.getElementById('modal');
-const modalForm=document.getElementById('modalForm');
-const modalTitle=document.getElementById('modalTitle');
-
-let items = JSON.parse(localStorage.getItem('estoque')) || [];
-
-function save(){ localStorage.setItem('estoque', JSON.stringify(items)); }
-
-function login(){
-  if(user.value===USER && pass.value===PASS){
-    localStorage.setItem('auth','ok');
-    loginBox.style.display='none'; app.style.display='block'; render();
-  } else alert('Login inválido');
+// ⌨️ ENTER HANDLER GLOBAL
+function handleEnter(e, action){
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    if(action === 'login') login();
+    if(action === 'submit') modalForm.requestSubmit();
+  }
 }
-function logout(){ localStorage.clear(); location.reload(); }
-if(localStorage.getItem('auth')==='ok'){ loginBox.style.display='none'; app.style.display='block'; render(); }
+
+// 🔥 CONFIG FIREBASE (cole os seus dados aqui)
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJETO",
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+const loginBox = document.getElementById('login');
+const app = document.getElementById('app');
+const catalog = document.getElementById('catalog');
+const modal = document.getElementById('modal');
+const modalForm = document.getElementById('modalForm');
+const modalTitle = document.getElementById('modalTitle');
+
+let items = [];
 
 function stockClass(q){ if(q<=0)return 'out'; if(q<=5)return 'low'; return 'ok'; }
 
@@ -90,13 +102,40 @@ function render(){
   catalog.innerHTML='';
   items.forEach(i=>{
     catalog.innerHTML+=`
-    <div class="card">
-      <img src="${i.foto}">
-      <div class="card-body">
-        <div class="name">${i.nome}</div>
-        <div class="stock ${stockClass(i.quantidade)}">Estoque: ${i.quantidade}</div>
-      </div>
-    </div>`;
+      <div class="card">
+        <img src="${i.foto}">
+        <div class="card-body">
+          <div class="name">${i.nome}</div>
+          <div class="stock ${stockClass(i.quantidade)}">Estoque: ${i.quantidade}</div>
+        </div>
+      </div>`;
+  });
+}
+
+// 🔐 LOGIN
+function login(){
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .catch(e=>alert(e.message));
+}
+function logout(){ auth.signOut(); }
+
+// 🔄 AUTH STATE
+auth.onAuthStateChanged(user=>{
+  if(user){
+    loginBox.style.display='none';
+    app.style.display='block';
+    loadItems();
+  } else {
+    loginBox.style.display='flex';
+    app.style.display='none';
+  }
+});
+
+// 📦 BANCO
+function loadItems(){
+  db.collection('estoque').onSnapshot(snap=>{
+    items = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render();
   });
 }
 
@@ -109,16 +148,16 @@ function openModal(type){
       <input name="nome" placeholder="Nome" required>
       <input name="foto" placeholder="Foto URL" required>
       <input type="number" name="quantidade" placeholder="Quantidade" required>
-      <button>Cadastrar</button>`;
+      <button type="submit" onkeydown="handleEnter(event, 'submit')">Cadastrar</button>`;
   }
 
   if(type==='move'){
     modalTitle.textContent='Entrada / Saída';
     modalForm.innerHTML=`
-      <select name="nome">${items.map(i=>`<option>${i.nome}</option>`).join('')}</select>
+      <select name="id">${items.map(i=>`<option value="${i.id}">${i.nome}</option>`).join('')}</select>
       <select name="tipo"><option>Entrada</option><option>Saída</option></select>
       <input type="number" name="quantidade" placeholder="Quantidade" required>
-      <button>Registrar</button>`;
+      <button type="submit" onkeydown="handleEnter(event, 'submit')">Registrar</button>`;
   }
 
   modalForm.onsubmit=e=>submitForm(e,type);
@@ -126,16 +165,20 @@ function openModal(type){
 
 function submitForm(e,type){
   e.preventDefault();
-  const d=Object.fromEntries(new FormData(e.target));
+  const d = Object.fromEntries(new FormData(e.target));
 
-  if(type==='add') items.push({nome:d.nome,foto:d.foto,quantidade:+d.quantidade});
-
-  if(type==='move'){
-    const it=items.find(i=>i.nome===d.nome);
-    if(it) it.quantidade += d.tipo==='Entrada'? +d.quantidade : -d.quantidade;
+  if(type==='add'){
+    db.collection('estoque').add({nome:d.nome,foto:d.foto,quantidade:+d.quantidade});
   }
 
-  save(); render(); modal.classList.remove('active');
+  if(type==='move'){
+    const it = items.find(i=>i.id===d.id);
+    if(!it) return;
+    const nova = d.tipo==='Entrada' ? it.quantidade + +d.quantidade : it.quantidade - +d.quantidade;
+    db.collection('estoque').doc(it.id).update({quantidade:nova});
+  }
+
+  modal.classList.remove('active');
 }
 
 modal.onclick=e=>{ if(e.target===modal) modal.classList.remove('active'); }
